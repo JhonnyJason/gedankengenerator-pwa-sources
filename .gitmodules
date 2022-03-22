@@ -1,0 +1,15 @@
+[submodule "source/statemodule"]
+	path = source/statemodule
+	url = git@github.com:JhonnyJason/pwa-sources-statemodule.git
+[submodule "source/vanillautilmodule"]
+	path = source/vanillautilmodule
+	url = git@github.com:JhonnyJason/pwa-sources-vanillautilmodule.git
+[submodule "source/messageboxmodule"]
+	path = source/messageboxmodule
+	url = git@github.com:JhonnyJason/pwa-sources-messageboxmodule.git
+[submodule "source/buttonstylemodule"]
+	path = source/buttonstylemodule
+	url = git@github.com:JhonnyJason/pwa-sources-buttonstylemodule.git
+[submodule "source/slideinframemodule"]
+	path = source/slideinframemodule
+	url = git@github.com:JhonnyJason/pwa-sources-slideinframemodule.git
