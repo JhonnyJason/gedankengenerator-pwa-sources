@@ -1,4 +1,3 @@
-configmodule = {name: "configmodule", uimodule: false}
 ############################################################
 #region printLogFunctions
 log = (arg) ->
@@ -10,14 +9,12 @@ print = (arg) -> console.log(arg)
 #endregion
 
 ########################################################
-configmodule.initialize = ->
+export initialize = ->
     log "configmodule.initialize"
     return    
 
 ########################################################
 #region exposedProperties
-configmodule.prop = true
+export prop = true
 
 #endregion
-
-export default configmodule
