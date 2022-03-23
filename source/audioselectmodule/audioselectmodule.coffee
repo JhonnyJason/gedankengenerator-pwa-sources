@@ -9,50 +9,40 @@ olog = (obj) -> log "\n" + ostr(obj)
 print = (arg) -> console.log(arg)
 #endregion
 
+# hiddenAudioElement = null
+state = null
+
 ############################################################
 export initialize = ->
     log "audioselectmodule.initialize"
     #Implement or Remove :-)
+    state = allModules.statemodule
     audioselectInput.addEventListener("change", audioselectInputChanged)
 
-    return
+    # dataURL = state.load("dataURL")
+    # if dataURL then hiddenAudioElement.src = dataURL
+    # olog dataURL
     
-#
-############################################################
-source = null
-
-############################################################
-currentMode = "image"
-
-############################################################
-imageselectmodule.initialize = () ->
-    log "imageselectmodule.initialize"
-    source = allModules.sourceimagemodule
-    
-    #region addEventListeners
-    imageselectInput.addEventListener("change", imageselectInputChanged)
-    #endregion
     return
 
 ############################################################
 #region eventHandlers
-imageselectInputChanged = ->
-    log "imageselectInputChanged"
-    file = imageselectInput.files[0]
-    if file then source.setAsSourceFile(file)
+audioselectInputChanged = ->
+    log "audioselectInputChanged"
+    file = audioselectInput.files[0]
+    reader = new FileReader()
+    reader.onload = (evt)->
+        state.save("audioDataURLFile", evt.target.result, true)
+    # dataURL = URL.createObjectURL(file)
+    reader.readAsDataURL(file)
+
+    # dataURL = URL.createObjectURL(file)
+    # if dataURL then hiddenAudioElement.src = dataURL
+    # olog dataURL
+    # state.save("dataURL", dataURL)
     return
 
-captureButtonClicked = ->
-    log "captureIconClicked"
-    source.captureCamImage()
-    return
 
-resumeButtonClicked = ->
-    log "captureIconClicked"
-    source.resumeVideo()
-    return
+
+
 #endregion
-
-
-
-

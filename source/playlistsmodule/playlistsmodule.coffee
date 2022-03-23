@@ -18,16 +18,15 @@ state = null
 export initialize = ->
     log "playlistsmodule.initialize"
     state = allModules.statemodule
-    playlists = state.load("playlists")
-    playlistNames = state.load("playlistNames")
+    playlists = state.get("playlists")
+    playlistNames = state.get("playlistNames")
     # olog playlists
     # olog playlistNames
     if !playlists? 
         playlists = [[]]
         playlistNames = ["default"]
-        state.set("playlists", playlists)
-        state.set("playlistNames", playlistNames)
-        state.saveAll()
+        state.save("playlists", playlists)
+        state.save("playlistNames", playlistNames)
     # olog playlists
     # olog playlistNames
     return
