@@ -38,10 +38,11 @@ export initialize = ->
         catch err
             log "an error occured!" 
             olog err
+            log err.message
     return
 
 
-createConnection = -> new Proise(res, rej) ->
+createConnection = -> new Promise (res, rej) ->
     request = db.open(dbName, dbVersion)
     request.onupgradeneeded = doUpgrade
     request.onsuccess = -> res(request.result)
@@ -55,7 +56,7 @@ doUpgrade = ->
     return
 
 ############################################################
-export store = (audioData, key = null) -> new Promise(res, rej) ->
+export store = (audioData, key = null) -> new Promise (res, rej) ->
     trx = dbConnection.transaction(STORENAME, "readwrite")
     trx.onerror = (evt) -> rej(evt)
     objStore = trx.objectStore(STORENAME)
@@ -63,7 +64,7 @@ export store = (audioData, key = null) -> new Promise(res, rej) ->
     request.onsuccess = (evt) -> res(evt.result)
     return    
 
-export remove = (key) -> new Promise(res, rej) ->
+export remove = (key) -> new Promise (res, rej) ->
     trx = dbConnection.transaction(STORENAME, "readwrite")
     trx.onerror = (evt) -> rej(evt)
     objStore = trx.objectStore(STORENAME)
@@ -71,7 +72,7 @@ export remove = (key) -> new Promise(res, rej) ->
     request.onsuccess = -> res()
     return
 
-export get = (key) -> new Promise(res, rej) ->
+export get = (key) -> new Promise (res, rej) ->
     trx = dbConnection.transaction(STORENAME)
     trx.onerror = (evt) -> rej(evt)
     objStore = trx.objectStore(STORENAME)
