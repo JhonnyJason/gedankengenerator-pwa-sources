@@ -7,6 +7,7 @@ import * as messageboxmodule from "./messageboxmodule"
 import * as playlistsmodule from "./playlistsmodule"
 import * as slideinframemodule from "./slideinframemodule"
 import * as statemodule from "./statemodule"
+import * as storagemodule from "./storagemodule"
 import * as vanillautilmodule from "./vanillautilmodule"
 
 Modules = {
@@ -19,6 +20,7 @@ Modules = {
     playlistsmodule,
     slideinframemodule,
     statemodule,
+    storagemodule,
     vanillautilmodule,
 }
 

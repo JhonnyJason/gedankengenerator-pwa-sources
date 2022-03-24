@@ -1,7 +1,8 @@
 ############################################################
 export modulesToDebug = 
     unbreaker: true
-    audioselectmodule: true
+    # audioselectmodule: true
     audiorecordermodule: true
-    configmodule: true
-    playlistsmodule: true
+    # configmodule: true
+    # playlistsmodule: true
+    storagemodule: true
