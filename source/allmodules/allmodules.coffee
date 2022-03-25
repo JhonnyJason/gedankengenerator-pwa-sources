@@ -1,5 +1,6 @@
 import * as audiorecordermodule from "./audiorecordermodule"
 import * as audioselectmodule from "./audioselectmodule"
+import * as audiostoremodule from "./audiostoremodule"
 import * as configmodule from "./configmodule"
 import * as controlsmodule from "./controlsmodule"
 import * as debugmodule from "./debugmodule"
@@ -13,6 +14,7 @@ import * as vanillautilmodule from "./vanillautilmodule"
 Modules = {
     audiorecordermodule,
     audioselectmodule,
+    audiostoremodule,
     configmodule,
     controlsmodule,
     debugmodule,

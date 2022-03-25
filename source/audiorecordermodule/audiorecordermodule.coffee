@@ -1,4 +1,3 @@
-export name = "audiorecordermodule"
 ############################################################
 #region printLogFunctions
 log = (arg) ->
@@ -10,42 +9,32 @@ print = (arg) -> console.log(arg)
 #endregion
 
 ############################################################
-import lame from 'lamejs'
+# import lame from 'lamejs'
+audioStore = null
+controls = null
+state = null
 
+############################################################
 ctx = null
 micRecorder = null
 
 dataChunks = []
 
-mic = null 
-micGain = null
-micFilter = null
-micConvolver = null
-
+############################################################
 startable = true
 stoppable = false
 
 ############################################################
 export initialize = ->
     log "audiorecordermodule.initialize"
+    audioStore = allModules.audiostoremodule
+    controls = allModules.controlsmodule
+    state = allModules.statemodule
+    
     ctx = new window.AudioContext()
-    return
 
-
-############################################################
-saveBuffer = (audioBuffer) ->
-    log "saveBuffer"
-    olog audioBuffer
-    blob = new Blob([toWav(audioBuffer)]);
-    return
-
-
-handleError = (error) ->
-    olog error
-    return
-
-onRecordingStart = (stopFun) ->
-    toStop = stopFun
+    micIsAllowed = state.get("micIsAllowed")
+    if micIsAllowed? then createMic()
     return
 
 ############################################################
@@ -65,58 +54,27 @@ export createMic = ->
         micRecorder = new MediaRecorder(stream, options)
         micRecorder.ondataavailable = onMicData
         micRecorder.onstop = onRecordingEnded
-        # mic = ctx.createMediaStreamSource(stream)
-        # mic.connect(micFilter)
-        # micFilter.connect(micGain)
-        # micConvolver.connect(micGain)
+        state.save("micIsAllowed", true)
+        controls.micOn()
     catch err
         log('Error on getUserMedia: ' + err)
+        state.save("micIsAllowed", false)
+        controls.micOff()
     return
 
 export destroyMic = ->
     log "audiorecorder.destroyMic"
-    log "TODO"
+    log "TODO: remove microphone stream."
     return
 
 onRecordingEnded = (evt) ->
     log "onRecordingEnded"
-    audioBlob = new Blob(dataChunks);
-    dataURL = URL.createObjectURL(audioBlob)
-    hiddenAudioElement.src = dataURL
+    audioBlob = new Blob(dataChunks, {type: micRecorder.mimeType});
+    audioStore.add(audioBlob)
 
     stoppable = false
     startable = true
-
-    # console.log("data available after MediaRecorder.stop() called.");
-
-    # var clipName = prompt('Enter a name for your sound clip');
-
-    # var clipContainer = document.createElement('article');
-    # var clipLabel = document.createElement('p');
-    # var audio = document.createElement('audio');
-    # var deleteButton = document.createElement('button');
-
-    # clipContainer.classList.add('clip');
-    # audio.setAttribute('controls', '');
-    # deleteButton.innerHTML = "Delete";
-    # clipLabel.innerHTML = clipName;
-
-    # clipContainer.appendChild(audio);
-    # clipContainer.appendChild(clipLabel);
-    # clipContainer.appendChild(deleteButton);
-    # soundClips.appendChild(clipContainer);
-
-    # audio.controls = true;
-    # var blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
-    # chunks = [];
-    # var audioURL = URL.createObjectURL(blob);
-    # audio.src = audioURL;
-    # console.log("recorder stopped");
-
-    # deleteButton.onclick = function(e) {
-    # evtTgt = e.target;
-    # evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-    # } 
+    return
 
 onMicData = (evt) ->
     log "onMicData"
@@ -130,31 +88,9 @@ export startRecording = ->
     return unless startable
     startable = false
     stoppable = true
-    dataChunks.length = 0
+    dataChunks = []
     micRecorder.start()
-
-    # mediaRecorder.start();
-    # console.log(mediaRecorder.state);
-    # console.log("recorder started");
-    # record.style.background = "red";
-    # record.style.color = "black";
-
-    # log "startRecording"
-    # if toStop? 
-    #     toStop()
-    #     toStop = null
-    #     return
-    
-    # toStop = true
-
-    # options = 
-    #     onEnded: saveBuffer 
-    #     onError: handleError
-    #     onRecordingStart: onRecordingStart 
-    #     addNodes: null
-
-    # audioCtx = micToBuffer(options);
-
+    controls.setStateRecording()
     return
 
 export stopRecording = ->
@@ -163,5 +99,6 @@ export stopRecording = ->
     stoppable = false
     startable = false
     micRecorder.stop()
+    controls.unsetStateRecording()
     return
 

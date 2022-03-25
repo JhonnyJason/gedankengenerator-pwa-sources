@@ -1,4 +1,3 @@
-export name = "audioselectmodule"
 ############################################################
 #region printLogFunctions
 log = (arg) ->
@@ -9,37 +8,58 @@ olog = (obj) -> log "\n" + ostr(obj)
 print = (arg) -> console.log(arg)
 #endregion
 
-# hiddenAudioElement = null
-state = null
+############################################################
+audioStore = null
 
 ############################################################
 export initialize = ->
     log "audioselectmodule.initialize"
-    #Implement or Remove :-)
-    state = allModules.statemodule
-    audioselectInput.addEventListener("change", audioselectInputChanged)
+    audioStore = allModules.audiostoremodule
+    audioselectInput.addEventListener("change", audioselectInputChanged)    
+    return
 
-    # dataURL = state.load("dataURL")
-    # if dataURL then hiddenAudioElement.src = dataURL
-    # olog dataURL
+############################################################
+digestFile = (file) ->
+    # one = performance.now()
+
+    # Version direct arrayBuffer - most performant
+    # 
+    # data = await file.arrayBuffer()
+    # blob = new Blob([data], {type: file.type})
+    # two = performance.now()
+    # delta = two - one
+    # log "performance delta was: "+delta
+
+    # audioStore.add(blob)
+
+    # Version DataURL by createObjectURL - close second
+    #
+    # dataURL = URL.createObjectURL(file)
+    # blob = await (await fetch(dataURL)).blob()
+    # two = performance.now()
+    # delta = two - one
+    # log "performance delta was: "+delta
+
+    # audioStore.add(blob)
     
+    # Version FileReader - super slow third
+    #
+    # reader = new FileReader()
+    # reader.onload = (evt) ->
+    #     blob = await (await fetch(evt.target.result)).blob()
+    #     two = performance.now()
+    #     delta = two - one
+    #     log "performance delta was: "+delta
+
+    #     audioStore.add(blob)
+    # reader.readAsDataURL(file)
     return
 
 ############################################################
 #region eventHandlers
 audioselectInputChanged = ->
     log "audioselectInputChanged"
-    file = audioselectInput.files[0]
-    reader = new FileReader()
-    reader.onload = (evt)->
-        state.save("audioDataURLFile", evt.target.result, true)
-    # dataURL = URL.createObjectURL(file)
-    reader.readAsDataURL(file)
-
-    # dataURL = URL.createObjectURL(file)
-    # if dataURL then hiddenAudioElement.src = dataURL
-    # olog dataURL
-    # state.save("dataURL", dataURL)
+    audioStore.add(file) for file in audioselectInput.files
     return
 
 

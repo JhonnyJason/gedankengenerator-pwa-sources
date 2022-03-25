@@ -1,4 +1,3 @@
-export name = "controlsmodule"
 ############################################################
 #region printLogFunctions
 log = (arg) ->
@@ -18,6 +17,7 @@ export initialize = ->
     log "controlsmodule.initialize"
     audioRecord = allModules.audiorecordermodule
     recordButton.addEventListener("click", recordButtonClicked)
+    stopRecordingButton.addEventListener("click", stopRecordingButtonClicked)
     micbutton.addEventListener("click", micButtonClicked)
     #Implement or Remove :-)
     return
@@ -25,22 +25,49 @@ export initialize = ->
 ############################################################
 recordButtonClicked = ->
     log "recordButtonClicked"
-    audioRecord.stopRecording()
     audioRecord.startRecording()
     return
-    
+
+stopRecordingButtonClicked = ->
+    log "stopRecordingButtonClicked"
+    audioRecord.stopRecording()
+    return
+
+
+
 ############################################################
 micButtonClicked = ->
     log "micButtonClicked" 
     if micOn
-        micbutton.classList.remove("on")
-        audio.destroyMic()
-        micOn = false
+        audioRecord.destroyMic()
     else
-        micbutton.classList.add("on")
         audioRecord.createMic()
-        micOn = true
     return
 
-export micToOff = ->
+############################################################
+#region exposedFunctions
+export micOff = ->
     log "controlsmodule.micToOff"
+    micbutton.classList.remove("on")
+    micOn = false
+    return
+
+export micOn = ->
+    micbutton.classList.add("on")
+    recordButton.classList.add("active")
+    micOn = true
+    return
+
+export setStateRecording = ->
+    log ".setStateRecording"
+    stopRecordingButton.classList.add("active")
+    recordButton.classList.add("recording")
+    return
+
+export unsetStateRecording = ->
+    log "unsetStateRecording"
+    stopRecordingButton.classList.remove("active")
+    recordButton.classList.remove("recording")
+    return
+
+#endregion

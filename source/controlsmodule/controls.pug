@@ -1,7 +1,11 @@
 //- controls structure
 #controls
-    svg#micbutton: use(href="#svg-microphone-icon")
-    button#record-button.click-button record
-    input#audioselect-input(type="file" accept="audio/*")
-    audio#hidden-audio-element(controls)
+    #micbutton.click-button: svg: use(href="#svg-microphone-icon")
+    #mic-line
+        button#record-button.click-button record
+        button#stop-recording-button.click-button stop
+    #select-files-line
+        input#audioselect-input(type="file" accept="audio/*" multiple)
+    #audio-element-line
+        audio#audio-element(controls)
     //- button#upload-button.click-button upload 

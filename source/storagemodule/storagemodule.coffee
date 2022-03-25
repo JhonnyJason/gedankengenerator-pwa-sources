@@ -15,11 +15,10 @@ db = null
 ############################################################
 dbName = null
 dbVersion = null
-STORENAME = "audioData"
+STORENAME = null
 
 ############################################################
 dbConnection = null
-
 
 
 ############################################################
@@ -28,12 +27,14 @@ export initialize = ->
     c = allModules.configmodule
     dbName = c.dbName
     dbVersion = c.dbVersion
+    STORENAME = c.dbStoreName
 
     db = window.indexedDB
     if !db then log "no indexedDB found!"
     else 
         try 
             dbConnection = await createConnection()
+
             log "success!"
         catch err
             log "an error occured!" 
@@ -41,27 +42,31 @@ export initialize = ->
             log err.message
     return
 
-
 createConnection = -> new Promise (res, rej) ->
     request = db.open(dbName, dbVersion)
     request.onupgradeneeded = doUpgrade
     request.onsuccess = -> res(request.result)
     request.onerror = -> rej(request.error)
-    request.onblocked = -> log('Waiting vor unblock!');
+    request.onblocked = -> log('Blocked: Waiting for unblock...');
     return
 
-doUpgrade = ->
+doUpgrade = (evt) ->
     log "doUpgrade"
-    log "well not yet^^"
+    oldVer = evt.oldVersion
+    newVer = evt.newVersion
+    log "upgrade from "+oldVer+" to "+newVer
+
+    t  = evt.target.result
+    t.createObjectStore(STORENAME, {keyPath: "_id", autoIncrement: true})
     return
 
 ############################################################
-export store = (audioData, key = null) -> new Promise (res, rej) ->
+export save = (audioData) -> new Promise (res, rej) ->
     trx = dbConnection.transaction(STORENAME, "readwrite")
     trx.onerror = (evt) -> rej(evt)
     objStore = trx.objectStore(STORENAME)
-    request = objectStore.add(audioData)
-    request.onsuccess = (evt) -> res(evt.result)
+    request = objStore.add(audioData)
+    request.onsuccess = (evt) -> res(evt.target.result)
     return    
 
 export remove = (key) -> new Promise (res, rej) ->
@@ -76,6 +81,6 @@ export get = (key) -> new Promise (res, rej) ->
     trx = dbConnection.transaction(STORENAME)
     trx.onerror = (evt) -> rej(evt)
     objStore = trx.objectStore(STORENAME)
-    request = objectStore.get(key)
+    request = objStore.get(key)
     request.onsuccess = (evt) -> res(evt.result)
     return

@@ -2,7 +2,13 @@
 #controls
     padding 20px
 
+    #mic-line
+        margin-bottom: 50px
+        margin-top 100px
     #micbutton
+        position: absolute
+        top 20px
+        left 20px
         background-color: #722
         color black
         width 30px
@@ -20,16 +26,31 @@
     button 
         background-color cd-flash
         padding 20px
-        width 200px
-    #record-button
+        width 100px
+
+    #record-button,
+    #stop-recording-button
         display block
         margin auto
-        margin-bottom 50px
+        pointer-events: none
+        filter: grayscale(100%)
     
+    #record-button.active
+        filter none
+        pointer-events: all
+    #stop-recording-button.active
+        filter none
+        pointer-events: all
+
+    #record-button.recording
+        background-color red
+
+
     #audioselect-input
         display block
         margin auto
         width 200px
+        margin-bottom 50px
 
     // #hidden-source-audio
     //     display none
