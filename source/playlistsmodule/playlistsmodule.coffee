@@ -24,7 +24,9 @@ export initialize = ->
     audioStore = allModules.audiostoremodule
 
     playlists = state.get("playlists")
+    state.setChangeDetectionFunction("playlists", () -> return true)
     playlistNames = state.get("playlistNames")
+    state.setChangeDetectionFunction("playlistNames", () -> return true)
     nameToIndex = {}
     nameToIndex[name] = idx for name,idx in playlistNames
     # olog nameToIndex
@@ -54,8 +56,9 @@ isNotInDefault = (obj) ->
 addToPlaylistByIndex = (idx, storageObject) ->
     log "addToPlaylistByIndex"
     el = {storageObject}
+    olog storageObject
     playlists[idx].push(el)
-    state.saveRegularState()
+    state.save("playlists", playlists)
     return
 
 removeFromPlaylistByIndex = (idx, storageObject) ->

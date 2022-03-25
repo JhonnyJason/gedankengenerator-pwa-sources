@@ -25,7 +25,7 @@ export initialize = ->
     playlists = allModules.playlistsmodule
 
     allStorageObjects = state.load("allStorageObjects")
-    state.setChangeDetectionFunction("allStorageObjects", () -> true)
+    state.setChangeDetectionFunction("allStorageObjects", () -> return true)
 
     if(!allStorageObjects?)
         allStorageObjects = [] 
@@ -72,5 +72,5 @@ createStorageObject = (blob) ->
     
     obj = {key,type,index}
     allStorageObjects[index] = obj
-    state.save("allStorageObjects")
+    state.save("allStorageObjects", allStorageObjects)
     return obj
