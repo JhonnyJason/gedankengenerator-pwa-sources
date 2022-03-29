@@ -1,5 +1,35 @@
 // playlists styles
+button-size = 25px
+
+#playlist-entry-template
+    display: none
+    
+.playlist-entry
+    display flex
+    align-items: center
+    justify-content: space-between
+    margin auto
+    margin-bottom 10px
+    width 300px
+    box-sizing: border-box
+
+    .playlist-entry-title
+        padding 12px
+        overflow: hidden
+        text-overflow: ellipsis
+    .click-button
+        overflow hidden
+        padding 12px
+        background-color rgba(0, 55, 177, 0.5)
+        width: button-size
+        height: button-size
+        svg
+            width: button-size
+            height: button-size
+.playlist-entry.playing
+    background-color rgba(177, 55, 55, 0.5)
+
 #playlists
     width 100%
     min-height 20px
-    background-color rgba(0, 0, 0, 0.2)
+    background-color rgba(0, 77, 0, 0.2)

@@ -9,6 +9,9 @@ print = (arg) -> console.log(arg)
 #endregion
 
 ############################################################
+import M from "mustache"
+
+############################################################
 state = null
 audioStore = null
 
@@ -16,6 +19,9 @@ audioStore = null
 playlists = null
 playlistNames = null
 nameToIndex = null
+
+############################################################
+entryTemplate = null
 
 ############################################################
 export initialize = ->
@@ -31,6 +37,9 @@ export initialize = ->
     nameToIndex[name] = idx for name,idx in playlistNames
     # olog nameToIndex
     addAllStorageObjectsToDefault()
+    
+    entryTemplate = playlistEntryTemplate.innerHTML
+    renderPlaylist(0)
     return
 
 ############################################################
@@ -74,10 +83,49 @@ setForPlaying = (storageObject) ->
     olog storageObject
     data = await audioStore.getAudioData(storageObject)
     dataURL = URL.createObjectURL(data)
+    log dataURL
     audioElement.src = dataURL
     return
 
+############################################################
+renderPlaylist = (idx) ->
+    log "renderPlaylist"
+    pl = playlists[idx]
+    name = playlistNames[idx]
+    return unless pl?
+    html = ""
+    for el,i in pl
+        html += createEntryHTML(el.storageObject, i, name)
+    defaultPlaylist.innerHTML = html
+    entries = defaultPlaylist.getElementsByClassName("playlist-entry")
+    entry.addEventListener("click", entryClicked) for entry in entries
+    return
+
+createEntryHTML = (storageObject,index, playlistName) ->
+    log "createEntryHTML"
+    cObj = 
+        index: index
+        title: storageObject.title
+        playlistName: playlistName
+
+    return M.render(entryTemplate, cObj)
+
+############################################################
+entryClicked = (evt) ->
+    log "entryClicked"
+    target = evt.currentTarget 
+    index = target.getAttribute("playlist-index")
+    playlistName = target.getAttribute("playlist-name")
+    log "index was: " + index
+    log "playlist name was: " + playlistName
+
+    pl = playlists[nameToIndex[playlistName]]
+    storageObject = pl[index].storageObject
+    setForPlaying(storageObject)
+    return
+
 #endregion
+
 
 ############################################################
 #region exposedFunctions
@@ -85,6 +133,8 @@ export addToDefault = (storageObject) ->
     log "playlistmodule.addToDefault"
     addToPlaylistByIndex(0, storageObject)
     setForPlaying(storageObject)
+    ## TODO restructure this line
+    renderPlaylist(0)
     return
 
 export addToPlaylist = (name, storageObject) ->

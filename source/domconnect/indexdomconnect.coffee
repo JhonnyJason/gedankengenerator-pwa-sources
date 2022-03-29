@@ -2,7 +2,9 @@ indexdomconnect = {name: "indexdomconnect"}
 
 ############################################################
 indexdomconnect.initialize = () ->
+    global.playlistEntryTemplate = document.getElementById("playlist-entry-template")
     global.playlists = document.getElementById("playlists")
+    global.defaultPlaylist = document.getElementById("default-playlist")
     global.audiorecorder = document.getElementById("audiorecorder")
     global.controls = document.getElementById("controls")
     global.micbutton = document.getElementById("micbutton")

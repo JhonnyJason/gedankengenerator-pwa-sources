@@ -1,3 +1,8 @@
 //- playlists structure
+#playlist-entry-template
+    .playlist-entry.playing(playlist-index="{{{index}}}" playlist-name="{{{playlistName}}}")
+        .playlist-entry-edit-button.click-button: svg: use(href="#svg-edit-icon")
+        .playlist-entry-title {{{title}}}
+        .playlist-entry-play-button.click-button: svg: use(href="#svg-play-icon")
 #playlists
     #default-playlist

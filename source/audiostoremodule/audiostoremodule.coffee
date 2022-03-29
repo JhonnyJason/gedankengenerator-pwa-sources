@@ -53,13 +53,14 @@ export getAudioData = (storageObject) ->
     log "get audiodata from StorageObject with key: " + storageObject.key
     key = storageObject.key
     if !audioDataCache[key]?
-        data = await store.get(@key)
+        data = await store.get(key)
         audioDataCache[key] = new Blob([data], {type:storageObject.type})
     return audioDataCache[key]
 
-
 export destroyAudioData = (storageObject) ->
     log "TODO: destroy StorageObject with key: " + storageObject.key
+
+export saveAllStorageObject = -> state.save("allStorageObjects", allStorageObjects)
 
 ############################################################
 createStorageObject = (blob) ->
@@ -69,8 +70,12 @@ createStorageObject = (blob) ->
     log "retrieved key "+ key
     audioDataCache[key] = blob
     index = allStorageObjects.length
-    
-    obj = {key,type,index}
+    title = "unnamed"
+    timestamp = (new Date()).toISOString()
+    creator = "me"
+
+    obj = {key, type, index, title, timestamp, creator}
     allStorageObjects[index] = obj
     state.save("allStorageObjects", allStorageObjects)
     return obj
+
