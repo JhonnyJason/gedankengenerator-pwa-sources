@@ -61,7 +61,9 @@ export getAudioData = (storageObject) ->
 export destroyAudioData = (storageObject) ->
     log "TODO: destroy StorageObject with key: " + storageObject.key
 
-export saveAllStorageObject = -> state.save("allStorageObjects", allStorageObjects)
+export save = -> state.save("allStorageObjects", allStorageObjects)
+
+export getStorageObject = (idx) -> allStorageObjects[idx]
 
 ############################################################
 createStorageObject = (blob) ->
@@ -77,6 +79,6 @@ createStorageObject = (blob) ->
 
     obj = {key, type, index, title, timestamp, creator}
     allStorageObjects[index] = obj
-    state.save("allStorageObjects", allStorageObjects)
+    save()
     return obj
 

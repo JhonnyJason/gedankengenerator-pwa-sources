@@ -24,6 +24,10 @@ nameToIndex = null
 entryTemplate = null
 
 ############################################################
+focusedTitleField = null
+oldContent = null
+
+############################################################
 export initialize = ->
     log "playlistsmodule.initialize"
     state = allModules.statemodule
@@ -106,8 +110,16 @@ renderPlaylist = (idx) ->
     for el,i in pl
         html += createEntryHTML(el.storageObject, i, name)
     defaultPlaylist.innerHTML = html
-    entries = defaultPlaylist.getElementsByClassName("playlist-entry")
-    entry.addEventListener("click", entryClicked) for entry in entries
+    # entries = defaultPlaylist.getElementsByClassName("playlist-entry")
+    # el.addEventListener("click", entryClicked) for el in entries
+    playButtons = defaultPlaylist.getElementsByClassName("playlist-entry-play-button")
+    el.addEventListener("click", playButtonClicked) for el in playButtons
+    editButtons = defaultPlaylist.getElementsByClassName("playlist-entry-edit-button")
+    el.addEventListener("click", editButtonClicked) for el in editButtons
+    titleFields = defaultPlaylist.getElementsByClassName("playlist-entry-title")
+    for el in titleFields
+        el.addEventListener("focus", titleFieldClicked)
+
     return
 
 createEntryHTML = (storageObject,index, playlistName) ->
@@ -120,8 +132,94 @@ createEntryHTML = (storageObject,index, playlistName) ->
     return M.render(entryTemplate, cObj)
 
 ############################################################
+blurOutTitleField = ->
+    return unless focusedTitleField?
+    focusedTitleField.blur()
+    focusedTitleField = null
+    return
+
+saveNewTitle = (title) ->
+    log "saveNewTitle"
+    entry = focusedTitleField.parentNode
+    index = entry.getAttribute("playlist-index")
+    playlistName = entry.getAttribute("playlist-name")
+    pl = playlists[nameToIndex[playlistName]]
+    storageObject = pl[index].storageObject
+    olog storageObject
+    storageObject.title = title
+    audioStore.save()
+    olog storageObject
+    return
+
+
+############################################################
+titleFieldType = (evt) ->
+    log "titleFieldType"
+    if(evt.key == "Escape")
+        log "typed Escape"
+        evt.target.textContent = oldContent
+        blurOutTitleField()
+        return
+    if(evt.key == "Enter")
+        log "typed Enter"
+        blurOutTitleField()
+        return
+    return
+
+titleFieldBlurred = (evt) ->
+    log "titleFieldBlurred"
+    newContent = evt.target.innerText
+    log ""+newContent
+    if newContent != oldContent then saveNewTitle(newContent)
+    #remove the event Listeners again
+    evt.target.removeEventListener("keydown", titleFieldType)
+    evt.target.removeEventListener("blur", titleFieldBlurred)
+    return
+
+titleFieldClicked = (evt) ->
+    log "titleFieldClicked"
+    target = evt.target
+    if target != focusedTitleField then blurOutTitleField()
+    
+    focusedTitleField = target
+    oldContent = target.innerText
+    #Add the event listeners
+    target.addEventListener("keydown", titleFieldType)
+    target.addEventListener("blur", titleFieldBlurred)
+    return
+
+editButtonClicked = (evt) ->
+    log "editButtonClicked"
+    entry = evt.currentTarget.parentNode
+    index = entry.getAttribute("playlist-index")
+    playlistName = entry.getAttribute("playlist-name")
+    log "index was: " + index
+    log "playlist name was: " + playlistName
+
+    # pl = playlists[nameToIndex[playlistName]]
+    # storageObject = pl[index].storageObject
+    # setForPlaying(storageObject)
+    # audioElement.play()
+    return
+
+playButtonClicked = (evt) ->
+    log "playButtonClicked"
+    entry = evt.currentTarget.parentNode
+    index = entry.getAttribute("playlist-index")
+    playlistName = entry.getAttribute("playlist-name")
+    log "index was: " + index
+    log "playlist name was: " + playlistName
+
+    pl = playlists[nameToIndex[playlistName]]
+    storageObject = pl[index].storageObject
+    setForPlaying(storageObject)
+    audioElement.play()
+    return
+
+
 entryClicked = (evt) ->
     log "entryClicked"
+    return
     target = evt.currentTarget 
     index = target.getAttribute("playlist-index")
     playlistName = target.getAttribute("playlist-name")
@@ -131,6 +229,7 @@ entryClicked = (evt) ->
     pl = playlists[nameToIndex[playlistName]]
     storageObject = pl[index].storageObject
     setForPlaying(storageObject)
+    audioElement.play()
     return
 
 #endregion
