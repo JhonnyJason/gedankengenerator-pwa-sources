@@ -82,6 +82,15 @@ setForPlaying = (storageObject) ->
     log "setForPlaying"
     olog storageObject
     data = await audioStore.getAudioData(storageObject)
+
+    # reader = new FileReader()
+    # onload = (evt) -> 
+    #     olog reader.result
+    #     audioElement.src = reader.result
+    # reader.addEventListener("load", onload)
+    # reader.readAsDataURL(data)
+
+    olog data.arrayBuffer().length
     dataURL = URL.createObjectURL(data)
     log dataURL
     audioElement.src = dataURL

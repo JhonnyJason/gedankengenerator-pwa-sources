@@ -54,6 +54,7 @@ export getAudioData = (storageObject) ->
     key = storageObject.key
     if !audioDataCache[key]?
         data = await store.get(key)
+        log data
         audioDataCache[key] = new Blob([data], {type:storageObject.type})
     return audioDataCache[key]
 

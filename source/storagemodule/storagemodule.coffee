@@ -66,7 +66,7 @@ export save = (audioData) -> new Promise (res, rej) ->
     trx.onerror = (evt) -> rej(evt)
     objStore = trx.objectStore(STORENAME)
     request = objStore.add(audioData)
-    request.onsuccess = (evt) -> res(evt.target.result)
+    request.onsuccess = (evt) -> res(request.result)
     return    
 
 export remove = (key) -> new Promise (res, rej) ->
@@ -82,5 +82,5 @@ export get = (key) -> new Promise (res, rej) ->
     trx.onerror = (evt) -> rej(evt)
     objStore = trx.objectStore(STORENAME)
     request = objStore.get(key)
-    request.onsuccess = (evt) -> res(evt.result)
+    request.onsuccess = (evt) -> res(request.result)
     return
