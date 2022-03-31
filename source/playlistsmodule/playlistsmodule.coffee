@@ -105,7 +105,7 @@ setForPlaying = (storageObject) ->
     dataURL = URL.createObjectURL(data)
     log dataURL
     audioElement.src = dataURL
-    audioElement.play()
+    # audioElement.play()
     return
 
 ############################################################
@@ -212,7 +212,7 @@ playButtonClicked = (evt) ->
     log "playButtonClicked"
     entry = evt.currentTarget.parentNode
     storageObject = getStorageObjectFromEntry(entry)
-    setForPlaying(storageObject)
+    await setForPlaying(storageObject)
     audioElement.play()
     return
 
