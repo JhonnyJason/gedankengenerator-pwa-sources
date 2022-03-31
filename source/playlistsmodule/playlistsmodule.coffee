@@ -33,6 +33,8 @@ export initialize = ->
     state = allModules.statemodule
     audioStore = allModules.audiostoremodule
 
+    audioElement.addEventListener("ended", audioPlayEnded)
+
     playlists = state.get("playlists")
     state.setChangeDetectionFunction("playlists", () -> return true)
     playlistNames = state.get("playlistNames")
@@ -61,14 +63,19 @@ addAllStorageObjectsToDefault = ->
 
 isNotInDefault = (obj) ->
     pl = playlists[0]
-    for el in pl when el.storageObject.index == obj.index then return false
+    for el in pl when el.objectIndex == obj.index then return false
     return true
 
+############################################################
+audioPlayEnded = (evt) ->
+    log "audioPlayEnded"
+    audioElement.src = ""
+    return
 
 ############################################################
 addToPlaylistByIndex = (idx, storageObject) ->
     log "addToPlaylistByIndex"
-    el = {storageObject}
+    el = {objectIndex: storageObject.index}
     olog storageObject
     playlists[idx].push(el)
     state.save("playlists", playlists)
@@ -77,7 +84,7 @@ addToPlaylistByIndex = (idx, storageObject) ->
 removeFromPlaylistByIndex = (idx, storageObject) ->
     log "removeFromPlaylist"
     plOld = playlists[idx]
-    playlists[idx] = plOld.filter((el) -> el.storageObject != storageObject)
+    playlists[idx] = plOld.filter((el) -> el.objectIndex != storageObject.index)
     state.saveRegularState()
     return
 
@@ -98,6 +105,7 @@ setForPlaying = (storageObject) ->
     dataURL = URL.createObjectURL(data)
     log dataURL
     audioElement.src = dataURL
+    audioElement.play()
     return
 
 ############################################################
@@ -108,7 +116,7 @@ renderPlaylist = (idx) ->
     return unless pl?
     html = ""
     for el,i in pl
-        html += createEntryHTML(el.storageObject, i, name)
+        html += createEntryHTML(el.objectIndex, i, name)
     defaultPlaylist.innerHTML = html
     # entries = defaultPlaylist.getElementsByClassName("playlist-entry")
     # el.addEventListener("click", entryClicked) for el in entries
@@ -122,16 +130,24 @@ renderPlaylist = (idx) ->
 
     return
 
-createEntryHTML = (storageObject,index, playlistName) ->
+createEntryHTML = (objectIndex, entryIndex, playlistName) ->
     log "createEntryHTML"
+    storageObject = audioStore.getStorageObject(objectIndex)
     cObj = 
-        index: index
+        index: entryIndex
         title: storageObject.title
         playlistName: playlistName
 
     return M.render(entryTemplate, cObj)
 
 ############################################################
+getStorageObjectFromEntry = (entry) ->
+    index = entry.getAttribute("playlist-index")
+    playlistName = entry.getAttribute("playlist-name")
+    pl = playlists[nameToIndex[playlistName]]
+    objectIndex = pl[index].objectIndex
+    return audioStore.getStorageObject(objectIndex)
+
 blurOutTitleField = ->
     return unless focusedTitleField?
     focusedTitleField.blur()
@@ -141,10 +157,7 @@ blurOutTitleField = ->
 saveNewTitle = (title) ->
     log "saveNewTitle"
     entry = focusedTitleField.parentNode
-    index = entry.getAttribute("playlist-index")
-    playlistName = entry.getAttribute("playlist-name")
-    pl = playlists[nameToIndex[playlistName]]
-    storageObject = pl[index].storageObject
+    storageObject = getStorageObjectFromEntry(entry)
     olog storageObject
     storageObject.title = title
     audioStore.save()
@@ -191,46 +204,18 @@ titleFieldClicked = (evt) ->
 editButtonClicked = (evt) ->
     log "editButtonClicked"
     entry = evt.currentTarget.parentNode
-    index = entry.getAttribute("playlist-index")
-    playlistName = entry.getAttribute("playlist-name")
-    log "index was: " + index
-    log "playlist name was: " + playlistName
-
-    # pl = playlists[nameToIndex[playlistName]]
-    # storageObject = pl[index].storageObject
-    # setForPlaying(storageObject)
-    # audioElement.play()
+    storageObject = getStorageObjectFromEntry(entry)
+    #TODO start edit UI
     return
 
 playButtonClicked = (evt) ->
     log "playButtonClicked"
     entry = evt.currentTarget.parentNode
-    index = entry.getAttribute("playlist-index")
-    playlistName = entry.getAttribute("playlist-name")
-    log "index was: " + index
-    log "playlist name was: " + playlistName
-
-    pl = playlists[nameToIndex[playlistName]]
-    storageObject = pl[index].storageObject
+    storageObject = getStorageObjectFromEntry(entry)
     setForPlaying(storageObject)
     audioElement.play()
     return
 
-
-entryClicked = (evt) ->
-    log "entryClicked"
-    return
-    target = evt.currentTarget 
-    index = target.getAttribute("playlist-index")
-    playlistName = target.getAttribute("playlist-name")
-    log "index was: " + index
-    log "playlist name was: " + playlistName
-
-    pl = playlists[nameToIndex[playlistName]]
-    storageObject = pl[index].storageObject
-    setForPlaying(storageObject)
-    audioElement.play()
-    return
 
 #endregion
 
@@ -239,20 +224,26 @@ entryClicked = (evt) ->
 #region exposedFunctions
 export addToDefault = (storageObject) ->
     log "playlistmodule.addToDefault"
+    if typeof(storageObject) == "number" then storageObject = audioStore.getStorageObject(storageObject)
+    
     addToPlaylistByIndex(0, storageObject)
-    setForPlaying(storageObject)
+    
     ## TODO restructure this line
     renderPlaylist(0)
     return
 
 export addToPlaylist = (name, storageObject) ->
     log "playlistsmodule.addToPlaylist"
+    if typeof(storageObject) == "number" then storageObject = audioStore.getStorageObject(storageObject)
+    
     idx = nameToIndex[name]
     addToPlaylistByIndex(idx, storageObject)
     return
 
 export removeFromPlaylist = (name, storageObject) ->
     log "playlistmodule.removeFromPlaylist"
+    if typeof(storageObject) == "number" then storageObject = audioStore.getStorageObject(storageObject)
+    
     idx = nameToIndex[name]
     removeFromPlaylistByIndex(idx, storageObject)
     return
